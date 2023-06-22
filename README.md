@@ -10,7 +10,7 @@
 <img src="./_docs/_system.png" width=600>
 
 ## 利用している技術
-- TypeScript
-- Next.js
-- socket.io
+- Go
+- Gin
+- melody(WebSocketライブラリ)
 - MongoDB

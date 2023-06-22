@@ -1,5 +1,4 @@
 # realtime-database-mock-backend
-# realtime-database-mock
 
 [![CI](https://github.com/k2font/realtime-database-mock/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/k2font/realtime-database-mock/actions/workflows/ci.yml)
 

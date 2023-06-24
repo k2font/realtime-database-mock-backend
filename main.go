@@ -86,9 +86,9 @@ func main() {
 	m.HandleMessage(func(s *melody.Session, msg []byte) {
 		// DBにデータを登録する
 		collection := client.Database("city").Collection("locations")
-		tokyo := Location{"Tokyo"}
+		data := Location{string(msg)}
 
-		insertResult, err := collection.InsertOne(context.Background(), tokyo)
+		insertResult, err := collection.InsertOne(context.Background(), data)
 		if err != nil {
 			log.Fatal(err)
 		}

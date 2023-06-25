@@ -76,7 +76,7 @@ func main() {
 				log.Fatal(err)
 			}
 
-			m.Broadcast([]byte(result.Name))
+			s.Write([]byte(result.Name))
 		}
 	})
 

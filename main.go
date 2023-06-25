@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -47,7 +46,7 @@ func main() {
 		m.HandleRequest(c.Writer, c.Request)
 	})
 
-	http.HandleFunc("/close", func(w http.ResponseWriter, r *http.Request) {
+	r.GET("close", func(c *gin.Context) {
 		// DBから接続を切断
 		err = client.Disconnect(
 			context.TODO(),

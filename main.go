@@ -2,11 +2,10 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
-	"net/http"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/olahol/melody"
 	"go.mongodb.org/mongo-driver/bson"
@@ -19,6 +18,10 @@ type Location struct {
 }
 
 func main() {
+	// Ginのセットアップ
+	r := gin.Default()
+
+	// dotenvのセットアップ
 	godotenv.Load()
 
 	URL := "mongodb+srv://k2font:" + os.Getenv("MONGODB_ATLAS_PASSWD") + "@cluster0.yqosybw.mongodb.net/?retryWrites=true&w=majority"
@@ -35,15 +38,15 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Connected to MongoDB!")
+	log.Default().Println("Connected to MongoDB!")
 
 	m := melody.New()
 
-	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		m.HandleRequest(w, r)
+	r.GET("/ws", func(c *gin.Context) {
+		m.HandleRequest(c.Writer, c.Request)
 	})
 
-	http.HandleFunc("/close", func(w http.ResponseWriter, r *http.Request) {
+	r.GET("close", func(c *gin.Context) {
 		// DBから接続を切断
 		err = client.Disconnect(
 			context.TODO(),
@@ -53,7 +56,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-		fmt.Println("Connection to MongoDB closed.")
+		log.Default().Println("Connection to MongoDB closed.")
 	})
 
 	// WebSocket接続時の処理
@@ -93,7 +96,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-		fmt.Println("Insert a single document: ", insertResult.InsertedID)
+		log.Default().Println("Insert a single document: ", insertResult.InsertedID)
 
 		// 登録したらDBからデータを一括取得
 
@@ -101,5 +104,6 @@ func main() {
 		m.Broadcast(msg)
 	})
 
-	http.ListenAndServe(":5001", nil)
+	// Ginの起動
+	r.Run(":5001")
 }

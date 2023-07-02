@@ -8,8 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/olahol/melody"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Location struct {
@@ -23,22 +21,20 @@ func main() {
 	// dotenvのセットアップ
 	godotenv.Load()
 
-	URL := "mongodb+srv://k2font:" + os.Getenv("MONGODB_ATLAS_PASSWD") + "@cluster0.yqosybw.mongodb.net/?retryWrites=true&w=majority"
-
 	// MongoDBに接続する
-	clientOptions := options.Client().ApplyURI(URL)
-	client, err := mongo.Connect(context.TODO(), clientOptions)
+	client, err := NewMongoClient(os.Getenv("MONGODB_ATLAS_PASSWD"))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// 疎通確認
+	// mongoの疎通確認
 	err = client.Ping(context.TODO(), nil)
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Default().Println("Connected to MongoDB!")
 
+	// Melodyのセットアップ
 	m := melody.New()
 
 	r.GET("/ws", func(c *gin.Context) {

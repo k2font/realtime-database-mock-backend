@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/olahol/melody"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -60,25 +59,7 @@ func main() {
 	})
 
 	// WebSocket接続時の処理
-	m.HandleConnect(func(s *melody.Session) {
-		// WebSocket接続時に全データを取得してbroadcastする
-		collection := client.Database("city").Collection("locations")
-
-		cur, err := collection.Find(context.TODO(), bson.D{})
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		for cur.Next(context.TODO()) {
-			var result Location
-			err := cur.Decode(&result)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			s.Write([]byte(result.Name))
-		}
-	})
+	m.HandleConnect(ConnectHandler(client))
 
 	// WebSocket切断時の処理
 	m.HandleDisconnect(DisconnectHandler())

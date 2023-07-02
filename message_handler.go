@@ -9,6 +9,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+// bsonへのUnmarshal処理において、構造が不明なデータをマッピングする場合、
+// 対象データの型をmap[string]interface{}型にするといい。
+// さらにタグにdataとomitemptyにするといい。
+// これは、CとRでdataプロパティの有無が変わるため。
 type Message struct {
 	Action   string                 `bson:"action"`
 	Document string                 `bson:"document"`

@@ -81,9 +81,7 @@ func main() {
 	})
 
 	// WebSocket切断時の処理
-	m.HandleDisconnect(func(s *melody.Session) {
-
-	})
+	m.HandleDisconnect(DisconnectHandler())
 
 	// メッセージ受信時の処理
 	m.HandleMessage(MessageHandler(client, m))

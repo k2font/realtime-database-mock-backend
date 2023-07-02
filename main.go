@@ -8,9 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/olahol/melody"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Location struct {
@@ -24,22 +21,20 @@ func main() {
 	// dotenvのセットアップ
 	godotenv.Load()
 
-	URL := "mongodb+srv://k2font:" + os.Getenv("MONGODB_ATLAS_PASSWD") + "@cluster0.yqosybw.mongodb.net/?retryWrites=true&w=majority"
-
 	// MongoDBに接続する
-	clientOptions := options.Client().ApplyURI(URL)
-	client, err := mongo.Connect(context.TODO(), clientOptions)
+	client, err := NewMongoClient(os.Getenv("MONGODB_ATLAS_PASSWD"))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// 疎通確認
+	// mongoの疎通確認
 	err = client.Ping(context.TODO(), nil)
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Default().Println("Connected to MongoDB!")
 
+	// Melodyのセットアップ
 	m := melody.New()
 
 	r.GET("/ws", func(c *gin.Context) {
@@ -60,49 +55,13 @@ func main() {
 	})
 
 	// WebSocket接続時の処理
-	m.HandleConnect(func(s *melody.Session) {
-		// WebSocket接続時に全データを取得してbroadcastする
-		collection := client.Database("city").Collection("locations")
-
-		cur, err := collection.Find(context.TODO(), bson.D{})
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		for cur.Next(context.TODO()) {
-			var result Location
-			err := cur.Decode(&result)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			s.Write([]byte(result.Name))
-		}
-	})
+	m.HandleConnect(ConnectHandler(client))
 
 	// WebSocket切断時の処理
-	m.HandleDisconnect(func(s *melody.Session) {
-
-	})
+	m.HandleDisconnect(DisconnectHandler())
 
 	// メッセージ受信時の処理
-	m.HandleMessage(func(s *melody.Session, msg []byte) {
-		// DBにデータを登録する
-		collection := client.Database("city").Collection("locations")
-		data := Location{string(msg)}
-
-		insertResult, err := collection.InsertOne(context.Background(), data)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		log.Default().Println("Insert a single document: ", insertResult.InsertedID)
-
-		// 登録したらDBからデータを一括取得
-
-		// DBに登録されたデータをブロードキャスト
-		m.Broadcast(msg)
-	})
+	m.HandleMessage(MessageHandler(client, m))
 
 	// Ginの起動
 	r.Run(":5001")

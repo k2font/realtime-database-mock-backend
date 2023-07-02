@@ -5,6 +5,9 @@
   - clientコードは以下のリポジトリ
   - https://github.com/k2font/realtime-database-mock
 
+## 使い方
+`$ go run .`
+
 ## システム構成
 
 **画像を挿入する**

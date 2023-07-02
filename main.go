@@ -86,23 +86,7 @@ func main() {
 	})
 
 	// メッセージ受信時の処理
-	m.HandleMessage(func(s *melody.Session, msg []byte) {
-		// DBにデータを登録する
-		collection := client.Database("city").Collection("locations")
-		data := Location{string(msg)}
-
-		insertResult, err := collection.InsertOne(context.Background(), data)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		log.Default().Println("Insert a single document: ", insertResult.InsertedID)
-
-		// 登録したらDBからデータを一括取得
-
-		// DBに登録されたデータをブロードキャスト
-		m.Broadcast(msg)
-	})
+	m.HandleMessage(MessageHandler(client, m))
 
 	// Ginの起動
 	r.Run(":5001")

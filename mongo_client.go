@@ -7,9 +7,13 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func NewMongoClient(mongo_passwd string) (*mongo.Client, error) {
+type MongoClient struct {
+	passwd string
+}
+
+func (m MongoClient) New() (*mongo.Client, error) {
 	// MongoDB AtlasのURLを作成
-	URL := "mongodb+srv://k2font:" + mongo_passwd + "@cluster0.yqosybw.mongodb.net/?retryWrites=true&w=majority"
+	URL := "mongodb+srv://k2font:" + m.passwd + "@cluster0.yqosybw.mongodb.net/?retryWrites=true&w=majority"
 
 	clientOptions := options.Client().ApplyURI(URL)
 	client, err := mongo.Connect(context.TODO(), clientOptions)

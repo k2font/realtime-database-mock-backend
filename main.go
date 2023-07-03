@@ -22,7 +22,8 @@ func main() {
 	godotenv.Load()
 
 	// MongoDBに接続する
-	client, err := NewMongoClient(os.Getenv("MONGODB_ATLAS_PASSWD"))
+	mongo := MongoClient{passwd: os.Getenv("MONGODB_ATLAS_PASSWD")}
+	client, err := mongo.New()
 	if err != nil {
 		log.Fatal(err)
 	}

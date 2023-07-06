@@ -34,6 +34,7 @@
     - R
       ```jsonc
       {
+        "_id": "xxxxxxxxxxxx", // 取得対象のドキュメントのID
         "action": "read", // 操作の種類
         "document": "users" // ドキュメント名
       }
@@ -53,6 +54,7 @@
     - D
       ```jsonc
       {
+        "_id": "xxxxxxxxxxxx", // 削除対象のドキュメントのID
         "action": "delete", // 操作の種類
         "document": "users" // ドキュメント名
       }

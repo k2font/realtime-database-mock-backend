@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 
 	"github.com/olahol/melody"
@@ -42,7 +41,6 @@ func MessageHandler(client *mongo.Client, m *melody.Melody) func(s *melody.Sessi
 		case "read":
 			// データをDBから取得
 		case "update":
-			fmt.Println(jsondata)
 			// DB上のデータを更新
 			// 送信されたメッセージのIDを取得し、DB上のデータを更新する
 			filter := bson.D{{Key: "id", Value: jsondata.Data["id"]}}
@@ -57,7 +55,12 @@ func MessageHandler(client *mongo.Client, m *melody.Melody) func(s *melody.Sessi
 			// 何もしない
 		}
 
+		bytes, err := json.Marshal(jsondata)
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		// DBに登録されたデータをブロードキャスト
-		m.Broadcast([]byte(jsondata.Data["message"].(string)))
+		m.Broadcast(bytes)
 	}
 }

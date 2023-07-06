@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 
 	"github.com/olahol/melody"
@@ -29,7 +30,12 @@ func ConnectHandler(client *mongo.Client) func(s *melody.Session) {
 				log.Fatal(err)
 			}
 
-			s.Write([]byte(result.Data["message"].(string)))
+			bytes, err := json.Marshal(result)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			s.Write(bytes)
 		}
 	}
 }

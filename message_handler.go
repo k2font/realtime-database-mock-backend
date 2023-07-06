@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/olahol/melody"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -22,10 +23,12 @@ type Message struct {
 func MessageHandler(client *mongo.Client, m *melody.Melody) func(s *melody.Session, msg []byte) {
 	return func(s *melody.Session, msg []byte) {
 		collection := client.Database("chat").Collection("message")
+
 		// jsonデータのメッセージをbsonデータに変換する
 		// https://www.mongodb.com/docs/drivers/go/current/fundamentals/bson/
 		var jsondata Message
 		json.Unmarshal(msg, &jsondata)
+
 		// jsondataのActionによって処理を分岐
 		switch jsondata.Action {
 		case "create":
@@ -38,7 +41,14 @@ func MessageHandler(client *mongo.Client, m *melody.Melody) func(s *melody.Sessi
 		case "read":
 			// データをDBから取得
 		case "update":
-			// データをDBで更新
+			// DB上のデータを更新
+			// 送信されたメッセージのIDを取得し、DB上のデータを更新する
+			filter := bson.D{{Key: "id", Value: jsondata.Data["id"]}}
+			result, err := collection.UpdateOne(context.TODO(), filter, jsondata.Data)
+			if err != nil {
+				log.Fatal(err)
+			}
+			log.Default().Println("Update a single document: ", result.UpsertedID)
 		case "delete":
 			// データをDBから削除
 		default:

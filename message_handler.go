@@ -21,12 +21,24 @@ type Message struct {
 
 func MessageHandler(client *mongo.Client, m *melody.Melody) func(s *melody.Session, msg []byte) {
 	return func(s *melody.Session, msg []byte) {
-		// DBにデータを登録する
 		collection := client.Database("chat").Collection("message")
 		// jsonデータのメッセージをbsonデータに変換する
 		// https://www.mongodb.com/docs/drivers/go/current/fundamentals/bson/
 		var jsondata Message
 		json.Unmarshal(msg, &jsondata)
+		// jsondataのActionによって処理を分岐
+		switch jsondata.Action {
+		case "create":
+			// データをDBに登録
+		case "read":
+			// データをDBから取得
+		case "update":
+			// データをDBで更新
+		case "delete":
+			// データをDBから削除
+		default:
+			// 何もしない
+		}
 		insertResult, err := collection.InsertOne(context.Background(), jsondata)
 		if err != nil {
 			log.Fatal(err)

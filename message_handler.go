@@ -30,6 +30,11 @@ func MessageHandler(client *mongo.Client, m *melody.Melody) func(s *melody.Sessi
 		switch jsondata.Action {
 		case "create":
 			// データをDBに登録
+			insertResult, err := collection.InsertOne(context.Background(), jsondata)
+			if err != nil {
+				log.Fatal(err)
+			}
+			log.Default().Println("Insert a single document: ", insertResult.InsertedID)
 		case "read":
 			// データをDBから取得
 		case "update":
@@ -39,12 +44,6 @@ func MessageHandler(client *mongo.Client, m *melody.Melody) func(s *melody.Sessi
 		default:
 			// 何もしない
 		}
-		insertResult, err := collection.InsertOne(context.Background(), jsondata)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		log.Default().Println("Insert a single document: ", insertResult.InsertedID)
 
 		// DBに登録されたデータをブロードキャスト
 		m.Broadcast([]byte(jsondata.Data["message"].(string)))

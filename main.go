@@ -10,10 +10,6 @@ import (
 	"github.com/olahol/melody"
 )
 
-type Location struct {
-	Name string
-}
-
 func main() {
 	// Ginのセットアップ
 	r := gin.Default()

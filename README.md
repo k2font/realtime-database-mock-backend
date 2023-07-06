@@ -41,6 +41,7 @@
     - U
       ```jsonc
       {
+        "_id": "xxxxxxxxxxxx", // 更新対象のドキュメントのID
         "action": "update", // 操作の種類
         "document": "users", // ドキュメント名
         "data": { // 更新するデータ

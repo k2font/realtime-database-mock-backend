@@ -14,6 +14,9 @@ func main() {
 	// Ginのセットアップ
 	r := gin.Default()
 
+	// https://pkg.go.dev/github.com/gin-gonic/gin#Engine.SetTrustedProxies
+	r.SetTrustedProxies(nil)
+
 	// dotenvのセットアップ
 	godotenv.Load()
 
